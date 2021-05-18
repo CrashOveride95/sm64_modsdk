@@ -29,9 +29,8 @@ $(eval $(call validate-option,COMPILER,gcc))
 #   jp - builds the 1996 Japanese version
 #   us - builds the 1996 North American version
 #   eu - builds the 1997 PAL version
-#   sh - builds the 1997 Japanese Shindou version, with rumble pak support
 VERSION ?= us
-$(eval $(call validate-option,VERSION,jp us eu sh))
+$(eval $(call validate-option,VERSION,jp us eu))
 
 ifeq      ($(VERSION),jp)
   DEFINES   += VERSION_JP=1
@@ -48,22 +47,14 @@ else ifeq ($(VERSION),eu)
   OPT_FLAGS := -O2
   GRUCODE   ?= f3dex2
   VERSION_JP_US  ?= false
-else ifeq ($(VERSION),sh)
-  DEFINES   += VERSION_SH=1
-  OPT_FLAGS := -O2
-  GRUCODE   ?= f3dex2
-  VERSION_JP_US  ?= false
 endif
 
 TARGET := sm64.$(VERSION)
 
 
 # GRUCODE - selects which RSP microcode to use.
-#   f3d_old - default for JP and US versions
-#   f3d_new - default for EU and Shindou versions
 #   f3dex   -
 #   f3dex2  -
-#   f3dzex  - newer, experimental microcode used in Animal Crossing
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
@@ -278,7 +269,7 @@ DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
-  CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
+  CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv
 else
   CFLAGS += -non_shared -Wab,-r4300_mul -Xcpluscomm -Xfullwarn -signed -32
 endif
@@ -616,7 +607,7 @@ $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)
 # Link SM64 ELF file
 $(ELF): $(O_FILES) $(MIO0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) undefined_syms.txt $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) -L /usr/lib/n64/ -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -lultra_rom -lgoddard
+	$(V)$(LD) -L /usr/lib/n64/ -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L $(N64_LIBGCCDIR) -lultra_rom -lgoddard -lgcc
 
 # Build ROM
 $(ROM): $(ELF)

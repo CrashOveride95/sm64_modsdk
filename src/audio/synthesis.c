@@ -8,6 +8,23 @@
 #include "internal.h"
 #include "external.h"
 
+// This is a version of aSetVolume which takes a single 32-bit parameter
+// instead of two 16-bit ones. According to AziAudio, it is used to set
+// ramping values when neither bit 4 nor bit 8 is set in the flags parameter.
+// It does not appear in the official abi.h header.
+/*
+ * Sets internal volume parameters.
+ * See aEnvMixer for more info.
+ */
+#define aSetVolume32(pkt, f, v, tr)                                     \
+{                                                                       \
+        Acmd *_a = (Acmd *)pkt;                                         \
+                                                                        \
+        _a->words.w0 = (_SHIFTL(A_SETVOL, 24, 8) | _SHIFTL(f, 16, 16) | \
+                    _SHIFTL(v, 0, 16));                                 \
+        _a->words.w1 = (u32)(tr);                                 \
+}
+
 
 #ifndef VERSION_SH
 #define DMEM_ADDR_TEMP 0x0
