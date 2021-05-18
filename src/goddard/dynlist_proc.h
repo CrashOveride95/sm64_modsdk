@@ -14,7 +14,7 @@ typedef void *DynObjName;
 /// as the name can be either a number or a string.
 /// @{
 #define DynNameAsStr(name) ((char *)(name))
-#define DynNameAsInt(name) ((u32)(uintptr_t)(name))
+#define DynNameAsInt(name) ((u32)(u32)(name))
 #define AsDynName(unk)   ((DynObjName)(unk))
 /// @}
 /// @}

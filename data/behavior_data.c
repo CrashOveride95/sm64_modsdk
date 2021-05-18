@@ -63,8 +63,8 @@
 #define BC_B0H(a, b) (_SHIFTL(a, 24, 8) | _SHIFTL(b, 0, 16))
 #define BC_H(a) _SHIFTL(a, 16, 16)
 #define BC_HH(a, b) (_SHIFTL(a, 16, 16) | _SHIFTL(b, 0, 16))
-#define BC_W(a) ((uintptr_t)(u32)(a))
-#define BC_PTR(a) ((uintptr_t)(a))
+#define BC_W(a) ((u32)(u32)(a))
+#define BC_PTR(a) ((u32)(a))
 
 
 // Defines the start of the behavior script as well as the object list the object belongs to.

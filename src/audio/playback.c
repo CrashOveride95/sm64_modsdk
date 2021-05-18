@@ -234,11 +234,11 @@ struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
     }
 
 #ifdef VERSION_EU
-    if (((uintptr_t) gBankLoadedPool.persistent.pool.start <= (uintptr_t) inst
-         && (uintptr_t) inst <= (uintptr_t)(gBankLoadedPool.persistent.pool.start
+    if (((u32) gBankLoadedPool.persistent.pool.start <= (u32) inst
+         && (u32) inst <= (u32)(gBankLoadedPool.persistent.pool.start
                     + gBankLoadedPool.persistent.pool.size))
-        || ((uintptr_t) gBankLoadedPool.temporary.pool.start <= (uintptr_t) inst
-            && (uintptr_t) inst <= (uintptr_t)(gBankLoadedPool.temporary.pool.start
+        || ((u32) gBankLoadedPool.temporary.pool.start <= (u32) inst
+            && (u32) inst <= (u32)(gBankLoadedPool.temporary.pool.start
                                    + gBankLoadedPool.temporary.pool.size))) {
         return inst;
     }
@@ -270,7 +270,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     }
 
 #ifndef NO_SEGMENTED_MEMORY
-    if ((uintptr_t) gCtlEntries[bankId].drums < 0x80000000U) {
+    if ((u32) gCtlEntries[bankId].drums < 0x80000000U) {
         stubbed_printf("Percussion Pointer Error\n");
         return NULL;
     }
@@ -392,7 +392,7 @@ void process_notes(void) {
         playbackState = (struct NotePlaybackState *) &note->priority;
         if (note->parentLayer != NO_LAYER) {
 #ifndef NO_SEGMENTED_MEMORY
-            if ((uintptr_t) playbackState->parentLayer < 0x7fffffffU) {
+            if ((u32) playbackState->parentLayer < 0x7fffffffU) {
                 continue;
             }
 #endif
@@ -679,7 +679,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     }
 
 #ifndef NO_SEGMENTED_MEMORY
-    if ((uintptr_t) gCtlEntries[bankId].drums < 0x80000000U) {
+    if ((u32) gCtlEntries[bankId].drums < 0x80000000U) {
         return NULL;
     }
 #endif

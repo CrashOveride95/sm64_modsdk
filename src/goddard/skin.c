@@ -510,16 +510,16 @@ void gd_print_net(struct ObjNet *net) {
     gd_printf("MaxRadius: %f\n", net->maxRadius);
     gd_print_mtx("Matrix:", &net->mat128);
     if (net->shapePtr != NULL) {
-        gd_printf("ShapePtr: %x (%s)\n", (u32) (uintptr_t) net->shapePtr, net->shapePtr->name);
+        gd_printf("ShapePtr: %x (%s)\n", (u32) (u32) net->shapePtr, net->shapePtr->name);
     } else {
         gd_printf("ShapePtr: NULL\n");
     }
     gd_print_vec("Scale:", &net->scale);
     gd_printf("Mass: %f\n", net->unusedMass);
     gd_printf("NumModes: %d\n", net->numModes);
-    gd_printf("NodeGroup: %x\n", (u32) (uintptr_t) net->unk1C8);
-    gd_printf("PlaneGroup: %x\n", (u32) (uintptr_t) net->unk1CC);
-    gd_printf("VertexGroup: %x\n", (u32) (uintptr_t) net->unk1D0);
+    gd_printf("NodeGroup: %x\n", (u32) (u32) net->unk1C8);
+    gd_printf("PlaneGroup: %x\n", (u32) (u32) net->unk1CC);
+    gd_printf("VertexGroup: %x\n", (u32) (u32) net->unk1D0);
 }
 
 /* 2422E0 -> 2422F8; orig name: func_80193B10 */

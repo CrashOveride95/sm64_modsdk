@@ -27,13 +27,13 @@
 #define OS_MESG_SI_COMPLETE 0x33333333
 
 #ifndef NO_SEGMENTED_MEMORY
-#define GD_VIRTUAL_TO_PHYSICAL(addr) ((uintptr_t)(addr) &0x0FFFFFFF)
-#define GD_LOWER_24(addr) ((uintptr_t)(addr) &0x00FFFFFF)
-#define GD_LOWER_29(addr) (((uintptr_t)(addr)) & 0x1FFFFFFF)
+#define GD_VIRTUAL_TO_PHYSICAL(addr) ((u32)(addr) &0x0FFFFFFF)
+#define GD_LOWER_24(addr) ((u32)(addr) &0x00FFFFFF)
+#define GD_LOWER_29(addr) (((u32)(addr)) & 0x1FFFFFFF)
 #else
 #define GD_VIRTUAL_TO_PHYSICAL(addr) (addr)
-#define GD_LOWER_24(addr) ((uintptr_t)(addr))
-#define GD_LOWER_29(addr) (((uintptr_t)(addr)))
+#define GD_LOWER_24(addr) ((u32)(addr))
+#define GD_LOWER_29(addr) (((u32)(addr)))
 #endif
 
 #define MTX_INTPART_PACK(w1, w2) (((w1) &0xFFFF0000) | (((w2) >> 16) & 0xFFFF))
@@ -1158,7 +1158,7 @@ void gdm_init(void *blockpool, u32 size) {
     // Align downwards?
     size = (size - 8) & ~7;
     // Align to next double word boundry?
-    blockpool = (void *) (((uintptr_t) blockpool + 8) & ~7);
+    blockpool = (void *) (((u32) blockpool + 8) & ~7);
     sMemBlockPoolBase = blockpool;
     sMemBlockPoolSize = size;
     sMemBlockPoolUsed = 0;
@@ -1691,7 +1691,7 @@ s32 gd_enddlsplist_parent(void) {
 }
 
 /* 24D39C -> 24D3D8 */
-void Unknown8019EBCC(s32 num, uintptr_t gfxptr) {
+void Unknown8019EBCC(s32 num, u32 gfxptr) {
     sGdDLArray[num]->gfx = (Gfx *) (GD_LOWER_24(gfxptr) + D_801BAF28);
 }
 
@@ -1700,7 +1700,7 @@ u32 new_gddl_from(Gfx *dl, UNUSED s32 arg1) {
     struct GdDisplayList *gddl;
 
     gddl = new_gd_dl(0, 0, 0, 0, 0, 0);
-    gddl->gfx = (Gfx *) (GD_LOWER_24((uintptr_t) dl) + D_801BAF28);
+    gddl->gfx = (Gfx *) (GD_LOWER_24((u32) dl) + D_801BAF28);
     return gddl->number;
 }
 
@@ -2696,8 +2696,8 @@ void stub_renderer_5(void) {
 
 /* 2522C0 -> 25245C */
 void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
-    uintptr_t orthoMtx;
-    uintptr_t rotMtx;
+    u32 orthoMtx;
+    u32 rotMtx;
 
     // Should produce G_RDPHALF_1 in Fast3D
     gSPPerspNormalize(next_gfx(), 0xFFFF);
@@ -2719,8 +2719,8 @@ void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
 void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far) {
     u16 perspNorm;
     UNUSED u32 unused1;
-    uintptr_t perspecMtx;
-    uintptr_t rotMtx;
+    u32 perspecMtx;
+    u32 rotMtx;
     UNUSED u32 unused2;
     UNUSED f32 unusedf = 0.0625f;
 
@@ -2759,8 +2759,8 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
                 view->colourBufs[1] = view->colourBufs[0];
             }
 
-            view->colourBufs[0] = (void *) ALIGN((uintptr_t) view->colourBufs[0], 64);
-            view->colourBufs[1] = (void *) ALIGN((uintptr_t) view->colourBufs[1], 64);
+            view->colourBufs[0] = (void *) ALIGN((u32) view->colourBufs[0], 64);
+            view->colourBufs[1] = (void *) ALIGN((u32) view->colourBufs[1], 64);
             stop_memtracker(memtrackerName);
 
             if (view->colourBufs[0] == NULL || view->colourBufs[1] == NULL) {
@@ -2780,7 +2780,7 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
                 if (view->zbuf == NULL) {
                     fatal_printf("Not enough DRAM for Z buffer\n");
                 }
-                view->zbuf = (void *) ALIGN((uintptr_t) view->zbuf, 64);
+                view->zbuf = (void *) ALIGN((u32) view->zbuf, 64);
             }
             stop_memtracker(memtrackerName);
         } else {
@@ -3398,7 +3398,7 @@ void Unknown801A5C80(struct ObjGroup *parentGroup) {
     label = (struct ObjLabel *) d_makeobj(D_LABEL, 0);
     d_set_rel_pos(10.0f, 230.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, gd_strdup("FT %2.2f"));
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTracked1FrameTime);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTracked1FrameTime);
     label->unk30 = 3;
     d_end_group("debugg");
 
@@ -3442,7 +3442,7 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
                 mtLabel = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
                 d_set_rel_pos(10.0f, sp244, 0.0f);
                 d_set_parm_ptr(PARM_PTR_CHAR, gd_strdup(mtStatsFmt));
-                d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &mt->total);
+                d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &mt->total);
                 mtLabel->unk30 = 3;
                 d_add_valproc(cvrt_val_to_kb);
                 sp23C = TRUE;
@@ -3493,7 +3493,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 1");
-    d_add_valptr("menu0", 0x40000, 0, (uintptr_t) NULL);
+    d_add_valptr("menu0", 0x40000, 0, (u32) NULL);
 
     sMenuGadgets[1] = d_makeobj(D_GADGET, "menu1");
     d_set_obj_draw_flag(OBJ_IS_GRABBALE);
@@ -3504,7 +3504,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 2");
-    d_add_valptr("menu1", 0x40000, 0, (uintptr_t) NULL);
+    d_add_valptr("menu1", 0x40000, 0, (u32) NULL);
 
     sMenuGadgets[2] = d_makeobj(D_GADGET, "menu2");
     d_set_obj_draw_flag(OBJ_IS_GRABBALE);
@@ -3515,7 +3515,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     label = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
     d_set_rel_pos(5.0f, 18.0f, 0.0f);
     d_set_parm_ptr(PARM_PTR_CHAR, "ITEM 3");
-    d_add_valptr("menu2", 0x40000, 0, (uintptr_t) NULL);
+    d_add_valptr("menu2", 0x40000, 0, (u32) NULL);
     sItemsInMenu = 3;
     d_end_group("menug");
 
@@ -3619,7 +3619,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar1 = (struct ObjGadget *) d_use_obj("bar1");
     bar1->colourNum = COLOUR_WHITE;
 
@@ -3630,7 +3630,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar2 = (struct ObjGadget *) d_use_obj("bar2");
     bar2->colourNum = COLOUR_PINK;
 
@@ -3641,7 +3641,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar3 = (struct ObjGadget *) d_use_obj("bar3");
     bar3->colourNum = COLOUR_WHITE;
 
@@ -3652,7 +3652,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar4 = (struct ObjGadget *) d_use_obj("bar4");
     bar4->colourNum = COLOUR_PINK;
 
@@ -3663,7 +3663,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar5 = (struct ObjGadget *) d_use_obj("bar5");
     bar5->colourNum = COLOUR_WHITE;
 
@@ -3674,7 +3674,7 @@ void make_timer_gadgets(void) {
     d_set_type(4);
     d_set_parm_f(PARM_F_RANGE_MIN, 0);
     d_set_parm_f(PARM_F_RANGE_MAX, sTimeScaleFactor);
-    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &sTimeScaleFactor);
+    d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &sTimeScaleFactor);
     bar6 = (struct ObjGadget *) d_use_obj("bar6");
     bar6->colourNum = COLOUR_PINK;
 
@@ -3690,14 +3690,14 @@ void make_timer_gadgets(void) {
         d_set_type(4);
         d_set_parm_f(PARM_F_RANGE_MIN, 0.0f);
         d_set_parm_f(PARM_F_RANGE_MAX, 1.0f);
-        d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (uintptr_t) &timer->prevScaledTotal);
+        d_add_valptr(NULL, 0, OBJ_VALUE_FLOAT, (u32) &timer->prevScaledTotal);
         sTimerGadgets[i] = (struct ObjGadget *) d_use_obj(timerNameBuf);
         sTimerGadgets[i]->colourNum = timer->gadgetColourNum;
 
         timerLabel = (struct ObjLabel *) d_makeobj(D_LABEL, AsDynName(0));
         d_set_rel_pos(5.0f, 14.0f, 0);
         d_set_parm_ptr(PARM_PTR_CHAR, (void *) timer->name);
-        d_add_valptr(timerNameBuf, 0x40000, 0, (uintptr_t) NULL);
+        d_add_valptr(timerNameBuf, 0x40000, 0, (u32) NULL);
         timerLabel->unk30 = 3;
     }
 
@@ -3739,7 +3739,7 @@ static void gd_block_dma(u32 romAddr, void *vAddr, s32 size) {
         osPiStartDma(&sGdDMAReqMesg, OS_MESG_PRI_NORMAL, OS_READ, romAddr, vAddr, blockSize, &sGdDMAQueue);
         osRecvMesg(&sGdDMAQueue, &sGdDMACompleteMsg, OS_MESG_BLOCK);
         romAddr += blockSize;
-        vAddr = (void *) ((uintptr_t) vAddr + blockSize);
+        vAddr = (void *) ((u32) vAddr + blockSize);
         size -= 0x1000;
     } while (size > 0);
 }
@@ -3751,8 +3751,8 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
     u32 segSize;
     u8 *allocSegSpace;
     void *allocPtr;
-    uintptr_t dynlistSegStart;
-    uintptr_t dynlistSegEnd;
+    u32 dynlistSegStart;
+    u32 dynlistSegEnd;
     s32 i;
     s32 tlbEntries;
     struct GdObj *loadedList;
@@ -3771,8 +3771,8 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 
     switch (sDynLists[i].flag) {
         case STD_LIST_BANK:
-            dynlistSegStart = (uintptr_t) _gd_dynlistsSegmentRomStart;
-            dynlistSegEnd = (uintptr_t) _gd_dynlistsSegmentRomEnd;
+            dynlistSegStart = (u32) _gd_dynlistsSegmentRomStart;
+            dynlistSegEnd = (u32) _gd_dynlistsSegmentRomEnd;
             break;
         default:
             fatal_printf("load_dynlist() unkown bank");
@@ -3787,7 +3787,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
         fatal_printf("Not enough DRAM for DATA segment \n");
     }
 
-    allocSegSpace = (u8 *) (((uintptr_t) allocSegSpace + PAGE_SIZE) & 0xFFFF0000);
+    allocSegSpace = (u8 *) (((u32) allocSegSpace + PAGE_SIZE) & 0xFFFF0000);
 
     // Copy the dynlist data from ROM
     gd_block_dma(dynlistSegStart, (void *) allocSegSpace, segSize);
@@ -3802,9 +3802,9 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
     // Map virtual address 0x04000000 to `allocSegSpace`
     for (i = 0; i < tlbEntries; i++) {
         osMapTLB(i, OS_PM_64K,
-            (void *) (uintptr_t) (0x04000000 + (i * 2 * PAGE_SIZE)),  // virtual address to map
-            GD_LOWER_24(((uintptr_t) allocSegSpace) + (i * 2 * PAGE_SIZE) + 0),  // even page address
-            GD_LOWER_24(((uintptr_t) allocSegSpace) + (i * 2 * PAGE_SIZE) + PAGE_SIZE),  // odd page address
+            (void *) (u32) (0x04000000 + (i * 2 * PAGE_SIZE)),  // virtual address to map
+            GD_LOWER_24(((u32) allocSegSpace) + (i * 2 * PAGE_SIZE) + 0),  // even page address
+            GD_LOWER_24(((u32) allocSegSpace) + (i * 2 * PAGE_SIZE) + PAGE_SIZE),  // odd page address
             -1);
     }
 

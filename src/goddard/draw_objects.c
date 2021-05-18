@@ -350,12 +350,12 @@ void check_face_bad_vtx(struct ObjFace *face) {
     for (i = 0; i < face->vtxCount; i++) {
         vtx = face->vertices[i];
         // These seem to be checks against bad conversions, or an outdated vertex structure..?
-        if ((uintptr_t) vtx == 39) {
+        if ((u32) vtx == 39) {
             gd_printf("bad1\n");
             return;
         }
-        if ((uintptr_t) vtx->gbiVerts == 0x3F800000) {
-            fatal_printf("bad2 %x,%d,%d,%d\n", (u32) (uintptr_t) vtx, vtx->scaleFactor, vtx->id, vtx->header.type);
+        if ((u32) vtx->gbiVerts == 0x3F800000) {
+            fatal_printf("bad2 %x,%d,%d,%d\n", (u32) (u32) vtx, vtx->scaleFactor, vtx->id, vtx->header.type);
         }
     }
 }
@@ -1275,7 +1275,7 @@ static void find_thisface_verts(struct ObjFace *face, struct ObjGroup *vertexGrp
         currIndex = 0;
         while (node != NULL) {
             if (node->obj->type == OBJ_TYPE_VERTICES || node->obj->type == OBJ_TYPE_PARTICLES) {
-                if (currIndex++ == (u32) (uintptr_t) face->vertices[i]) {
+                if (currIndex++ == (u32) (u32) face->vertices[i]) {
                     break;
                 }
             }

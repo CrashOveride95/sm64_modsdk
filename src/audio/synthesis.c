@@ -1033,16 +1033,16 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                                 v0_2 = sampleAddr + temp * 9;
                             } else {
                                 v0_2 = dma_sample_data(
-                                    (uintptr_t) (sampleAddr + temp * 9),
+                                    (u32) (sampleAddr + temp * 9),
                                     t0 * 9, flags, &synthesisState->sampleDmaIndex);
                             }
 #else
                             temp = (note->samplePosInt - s2 + 0x10) / 16;
                             v0_2 = dma_sample_data(
-                                (uintptr_t) (sampleAddr + temp * 9),
+                                (u32) (sampleAddr + temp * 9),
                                 t0 * 9, flags, &note->sampleDmaIndex);
 #endif
-                            a3 = (u32)((uintptr_t) v0_2 & 0xf);
+                            a3 = (u32)((u32) v0_2 & 0xf);
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, t0 * 9 + a3);
                             aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3));
                         } else {
@@ -1449,11 +1449,11 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                     if (audioBookSample->medium == 0) {
                         v0_2 = sp84 + (temp * unk_s6) + sampleAddr;
                     } else {
-                        v0_2 = dma_sample_data((uintptr_t)(sp84 + (temp * unk_s6) + sampleAddr),
+                        v0_2 = dma_sample_data((u32)(sp84 + (temp * unk_s6) + sampleAddr),
                                 ALIGN(t0 * unk_s6 + 16, 4), flags, &synthesisState->sampleDmaIndex, audioBookSample->medium);
                     }
 
-                    a3 = ((uintptr_t)v0_2 & 0xf);
+                    a3 = ((u32)v0_2 & 0xf);
                     addr = DMEM_ADDR_COMPRESSED_ADPCM_DATA;
                     addr -= ALIGN(t0 * unk_s6 + 16, 4);
                     aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr & 0xffff, ALIGN(t0 * unk_s6 + 16, 4));

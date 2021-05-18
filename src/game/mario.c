@@ -66,8 +66,8 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Animation *targetAnim = m->animation->targetAnim;
 
     if (load_patchable_table(m->animation, targetAnimID)) {
-        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
-        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
+        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (u32) targetAnim->values);
+        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (u32) targetAnim->index);
     }
 
     if (o->header.gfx.animInfo.animID != targetAnimID) {
@@ -99,8 +99,8 @@ s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
     struct Animation *targetAnim = m->animation->targetAnim;
 
     if (load_patchable_table(m->animation, targetAnimID)) {
-        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
-        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
+        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (u32) targetAnim->values);
+        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (u32) targetAnim->index);
     }
 
     if (o->header.gfx.animInfo.animID != targetAnimID) {

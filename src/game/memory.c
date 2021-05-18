@@ -40,7 +40,7 @@ struct MemoryPool {
     struct MemoryBlock freeList;
 };
 
-extern uintptr_t sSegmentTable[32];
+extern u32 sSegmentTable[32];
 extern u32 sPoolFreeSpace;
 extern u8 *sPoolStart;
 extern u8 *sPoolEnd;
@@ -54,7 +54,7 @@ extern struct MainPoolBlock *sPoolListHeadR;
  */
 struct MemoryPool *gEffectsMemoryPool;
 
-uintptr_t sSegmentTable[32];
+u32 sSegmentTable[32];
 u32 sPoolFreeSpace;
 u8 *sPoolStart;
 u8 *sPoolEnd;
@@ -64,8 +64,8 @@ struct MainPoolBlock *sPoolListHeadR;
 
 static struct MainPoolState *gMainPoolState = NULL;
 
-uintptr_t set_segment_base_addr(s32 segment, void *addr) {
-    sSegmentTable[segment] = (uintptr_t) addr & 0x1FFFFFFF;
+u32 set_segment_base_addr(s32 segment, void *addr) {
+    sSegmentTable[segment] = (u32) addr & 0x1FFFFFFF;
     return sSegmentTable[segment];
 }
 
@@ -75,14 +75,14 @@ void *get_segment_base_addr(s32 segment) {
 
 #ifndef NO_SEGMENTED_MEMORY
 void *segmented_to_virtual(const void *addr) {
-    size_t segment = (uintptr_t) addr >> 24;
-    size_t offset = (uintptr_t) addr & 0x00FFFFFF;
+    size_t segment = (u32) addr >> 24;
+    size_t offset = (u32) addr & 0x00FFFFFF;
 
     return (void *) ((sSegmentTable[segment] + offset) | 0x80000000);
 }
 
 void *virtual_to_segmented(u32 segment, const void *addr) {
-    size_t offset = ((uintptr_t) addr & 0x1FFFFFFF) - sSegmentTable[segment];
+    size_t offset = ((u32) addr & 0x1FFFFFFF) - sSegmentTable[segment];
 
     return (void *) ((segment << 24) + offset);
 }
@@ -113,8 +113,8 @@ void move_segment_table_to_dmem(void) {
  * freeing the object that was most recently allocated from a side.
  */
 void main_pool_init(void *start, void *end) {
-    sPoolStart = (u8 *) ALIGN16((uintptr_t) start) + 16;
-    sPoolEnd = (u8 *) ALIGN16((uintptr_t) end - 15) - 16;
+    sPoolStart = (u8 *) ALIGN16((u32) start) + 16;
+    sPoolEnd = (u8 *) ALIGN16((u32) end - 15) - 16;
     sPoolFreeSpace = sPoolEnd - sPoolStart;
 
     sPoolListHeadL = (struct MainPoolBlock *) (sPoolStart - 16);
@@ -172,14 +172,14 @@ u32 main_pool_free(void *addr) {
         }
         sPoolListHeadL = block;
         sPoolListHeadL->next = NULL;
-        sPoolFreeSpace += (uintptr_t) oldListHead - (uintptr_t) sPoolListHeadL;
+        sPoolFreeSpace += (u32) oldListHead - (u32) sPoolListHeadL;
     } else {
         while (oldListHead->prev != NULL) {
             oldListHead = oldListHead->prev;
         }
         sPoolListHeadR = block->next;
         sPoolListHeadR->prev = NULL;
-        sPoolFreeSpace += (uintptr_t) sPoolListHeadR - (uintptr_t) oldListHead;
+        sPoolFreeSpace += (u32) sPoolListHeadR - (u32) oldListHead;
     }
     return sPoolFreeSpace;
 }
@@ -250,7 +250,7 @@ static void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
     while (size != 0) {
         u32 copySize = (size >= 0x1000) ? 0x1000 : size;
 
-        osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize,
+        osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (u32) srcStart, dest, copySize,
                      &gDmaMesgQueue);
         osRecvMesg(&gDmaMesgQueue, &D_80339BEC, OS_MESG_BLOCK);
 

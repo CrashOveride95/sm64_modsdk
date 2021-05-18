@@ -39,7 +39,7 @@ struct LevelCommand {
 
 enum ScriptStatus { SCRIPT_RUNNING = 1, SCRIPT_PAUSED = 0, SCRIPT_PAUSED2 = -1 };
 
-static uintptr_t sStack[32];
+static u32 sStack[32];
 
 static struct AllocOnlyPool *sLevelPool = NULL;
 
@@ -48,8 +48,8 @@ static u16 sDelayFrames2 = 0;
 
 static s16 sCurrAreaIndex = -1;
 
-static uintptr_t *sStackTop = sStack;
-static uintptr_t *sStackBase = NULL;
+static u32 *sStackTop = sStack;
+static u32 *sStackBase = NULL;
 
 static s16 sScriptStatus;
 static s32 sRegister;
@@ -92,8 +92,8 @@ static void level_cmd_load_and_execute(void) {
     main_pool_push_state();
     load_segment(CMD_GET(s16, 2), CMD_GET(void *, 4), CMD_GET(void *, 8), MEMORY_POOL_LEFT);
 
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
-    *sStackTop++ = (uintptr_t) sStackBase;
+    *sStackTop++ = (u32) NEXT_CMD;
+    *sStackTop++ = (u32) sStackBase;
     sStackBase = sStackTop;
 
     sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 12));
@@ -116,7 +116,7 @@ static void level_cmd_exit(void) {
     main_pool_pop_state();
 
     sStackTop = sStackBase;
-    sStackBase = (uintptr_t *) *(--sStackTop);
+    sStackBase = (u32 *) *(--sStackTop);
     sCurrentCmd = (struct LevelCommand *) *(--sStackTop);
 }
 
@@ -147,7 +147,7 @@ static void level_cmd_jump(void) {
 }
 
 static void level_cmd_jump_and_link(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (u32) NEXT_CMD;
     sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 4));
 }
 
@@ -156,7 +156,7 @@ static void level_cmd_return(void) {
 }
 
 static void level_cmd_jump_and_link_push_arg(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (u32) NEXT_CMD;
     *sStackTop++ = CMD_GET(s16, 2);
     sCurrentCmd = CMD_NEXT;
 }
@@ -176,7 +176,7 @@ static void level_cmd_jump_repeat(void) {
 }
 
 static void level_cmd_loop_begin(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (u32) NEXT_CMD;
     *sStackTop++ = 0;
     sCurrentCmd = CMD_NEXT;
 }
@@ -200,7 +200,7 @@ static void level_cmd_jump_if(void) {
 
 static void level_cmd_jump_and_link_if(void) {
     if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4)) != 0) {
-        *sStackTop++ = (uintptr_t) NEXT_CMD;
+        *sStackTop++ = (u32) NEXT_CMD;
         sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 8));
     } else {
         sCurrentCmd = CMD_NEXT;

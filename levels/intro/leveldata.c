@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
+#include <gbi_add.h>
 
 #include "macros.h"
 #include "types.h"

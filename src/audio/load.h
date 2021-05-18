@@ -10,7 +10,7 @@
 #define PRELOAD_BANKS 2
 #define PRELOAD_SEQUENCE 1
 
-#define IS_SEQUENCE_CHANNEL_VALID(ptr) ((uintptr_t)(ptr) != (uintptr_t)&gSequenceChannelNone)
+#define IS_SEQUENCE_CHANNEL_VALID(ptr) ((u32)(ptr) != (u32)&gSequenceChannelNone)
 
 extern struct Note *gNotes;
 
@@ -76,12 +76,12 @@ struct PatchStruct {
 extern struct UnkStructSH8034EC88 D_SH_8034EC88[0x80];
 #endif
 
-void audio_dma_partial_copy_async(uintptr_t *devAddr, u8 **vAddr, ssize_t *remaining, OSMesgQueue *queue, OSIoMesg *mesg);
+void audio_dma_partial_copy_async(u32 *devAddr, u8 **vAddr, s32 *remaining, OSMesgQueue *queue, OSIoMesg *mesg);
 void decrease_sample_dma_ttls(void);
 #ifdef VERSION_SH
-void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef, s32 medium);
+void *dma_sample_data(u32 devAddr, u32 size, s32 arg2, u8 *dmaIndexRef, s32 medium);
 #else
-void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef);
+void *dma_sample_data(u32 devAddr, u32 size, s32 arg2, u8 *dmaIndexRef);
 #endif
 void init_sample_dma_buffers(s32 arg0);
 #if defined(VERSION_SH)

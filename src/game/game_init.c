@@ -37,8 +37,8 @@ OSMesgQueue D_80339CB8;
 OSMesg D_80339CD0;
 OSMesg D_80339CD4;
 struct VblankHandler gGameVblankHandler;
-uintptr_t gPhysicalFrameBuffers[3];
-uintptr_t gPhysicalZBuffer;
+u32 gPhysicalFrameBuffers[3];
+u32 gPhysicalZBuffer;
 void *D_80339CF0;
 void *D_80339CF4;
 struct MarioAnimation D_80339D10;
@@ -221,11 +221,16 @@ void create_task_structure(void) {
     gGfxSPTask->msgqueue = &D_80339CB8;
     gGfxSPTask->msg = (OSMesg) 2;
     gGfxSPTask->task.t.type = M_GFXTASK;
-    gGfxSPTask->task.t.ucode_boot = rspF3DBootStart;
-    gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspF3DBootEnd - (u8 *) rspF3DBootStart);
+    gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
+    gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
     gGfxSPTask->task.t.flags = 0;
-    gGfxSPTask->task.t.ucode = rspF3DStart;
-    gGfxSPTask->task.t.ucode_data = rspF3DDataStart;
+#ifdef   F3DEX_GBI_2
+    gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;
+#elif   F3DEX_GBI
+    gGfxSPTask->task.t.ucode = gspF3DEX_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspF3DEX_fifoDataStart;
+#endif
     gGfxSPTask->task.t.ucode_size = SP_UCODE_SIZE; // (this size is ignored)
     gGfxSPTask->task.t.ucode_data_size = SP_UCODE_DATA_SIZE;
     gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;

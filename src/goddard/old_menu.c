@@ -63,7 +63,7 @@ void Unknown8018B7A8(void *a0) {
  *
  * @param itemId  ID of the menu item that was clicked
  */
-static void menu_cb_default_settings(intptr_t itemId) {
+static void menu_cb_default_settings(s32 itemId) {
     struct ObjGroup *group = (struct ObjGroup *)itemId;  // Unpack pointer from menu item ID
     apply_to_obj_types_in_group(OBJ_TYPE_GADGETS, (applyproc_t) reset_gadget_default, group);
     apply_to_obj_types_in_group(OBJ_TYPE_VIEWS, (applyproc_t) stub_renderer_6, gGdViewsGroup);
@@ -77,7 +77,7 @@ static void add_item_to_default_settings_menu(struct ObjGroup *group) {
 
     if (group->debugPrint == 1) {
         // Convert pointer to integer and store it as the menu item ID.
-        sprintf(buf, "| %s %%x%d", group->name, (u32) (intptr_t) group);
+        sprintf(buf, "| %s %%x%d", group->name, (u32) (s32) group);
         gd_strcat(sDefSettingsMenuStr, buf);
     }
 }

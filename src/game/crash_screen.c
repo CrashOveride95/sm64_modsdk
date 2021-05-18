@@ -281,7 +281,7 @@ void crash_screen_set_framebuffer(u16 *framebuffer, u16 width, u16 height) {
 #ifdef VERSION_EU
     gCrashScreen.framebuffer = framebuffer;
 #else
-    gCrashScreen.framebuffer = (u16 *)((uintptr_t)framebuffer | 0xa0000000);
+    gCrashScreen.framebuffer = (u16 *)((u32)framebuffer | 0xa0000000);
 #endif
     gCrashScreen.width = width;
     gCrashScreen.height = height;

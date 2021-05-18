@@ -26,7 +26,7 @@ struct MemoryPool;
 extern struct MemoryPool *gEffectsMemoryPool;
 #endif
 
-uintptr_t set_segment_base_addr(s32 segment, void *addr);
+u32 set_segment_base_addr(s32 segment, void *addr);
 void *get_segment_base_addr(s32 segment);
 void *segmented_to_virtual(const void *addr);
 void *virtual_to_segmented(u32 segment, const void *addr);

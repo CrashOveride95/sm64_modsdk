@@ -316,8 +316,8 @@ struct SequencePlayer
 #if defined(VERSION_JP) || defined(VERSION_US)
     /*0x134, ?????*/ struct AudioBank *loadingBank;
 #endif
-    /*0x138, 0x140*/ uintptr_t bankDmaCurrDevAddr;
-    /*0x13C, 0x144*/ ssize_t bankDmaRemaining;
+    /*0x138, 0x140*/ u32 bankDmaCurrDevAddr;
+    /*0x13C, 0x144*/ s32 bankDmaRemaining;
 }; // size = 0x140, 0x148 on EU, 0x14C on SH
 
 struct AdsrSettings
@@ -847,7 +847,7 @@ struct PendingDmaSample {
     u8 medium;
     u8 bankId;
     u8 idx;
-    uintptr_t devAddr;
+    u32 devAddr;
     void *vAddr;
     u8 *resultSampleAddr;
     s32 state;

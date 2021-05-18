@@ -55,17 +55,17 @@
 
 #ifndef NO_SEGMENTED_MEMORY
 // convert a virtual address to physical.
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
+#define VIRTUAL_TO_PHYSICAL(addr)   ((u32)(addr) & 0x1FFFFFFF)
 
 // convert a physical address to virtual.
-#define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr) | 0x80000000)
+#define PHYSICAL_TO_VIRTUAL(addr)   ((u32)(addr) | 0x80000000)
 
 // another way of converting virtual to physical
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
 #else
 // no conversion needed other than cast
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
-#define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
+#define VIRTUAL_TO_PHYSICAL(addr)   ((u32)(addr))
+#define PHYSICAL_TO_VIRTUAL(addr)   ((u32)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 

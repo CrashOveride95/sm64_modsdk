@@ -26,7 +26,7 @@
 #define BHV_CMD_GET_U32(index)     (u32)(gCurBhvCommand[index])
 #define BHV_CMD_GET_VPTR(index)    (void *)(gCurBhvCommand[index])
 
-#define BHV_CMD_GET_ADDR_OF_CMD(index) (uintptr_t)(&gCurBhvCommand[index])
+#define BHV_CMD_GET_ADDR_OF_CMD(index) (u32)(&gCurBhvCommand[index])
 
 static u16 gRandomSeed16;
 
@@ -92,14 +92,14 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 }
 
 // Push the address of a behavior command to the object's behavior stack.
-static void cur_obj_bhv_stack_push(uintptr_t bhvAddr) {
+static void cur_obj_bhv_stack_push(u32 bhvAddr) {
     gCurrentObject->bhvStack[gCurrentObject->bhvStackIndex] = bhvAddr;
     gCurrentObject->bhvStackIndex++;
 }
 
 // Retrieve the last behavior command address from the object's behavior stack.
-static uintptr_t cur_obj_bhv_stack_pop(void) {
-    uintptr_t bhvAddr;
+static u32 cur_obj_bhv_stack_pop(void) {
+    u32 bhvAddr;
 
     gCurrentObject->bhvStackIndex--;
     bhvAddr = gCurrentObject->bhvStack[gCurrentObject->bhvStackIndex];

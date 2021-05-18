@@ -92,7 +92,7 @@ UNUSED s32 D_8038BCA8;
 struct GraphNode **gGeoViews;
 u16 gGeoNumViews; // length of gGeoViews array
 
-uintptr_t gGeoLayoutStack[16];
+u32 gGeoLayoutStack[16];
 struct GraphNode *gCurGraphNodeList[32];
 s16 gCurGraphNodeIndex;
 s16 gGeoLayoutStackIndex; // similar to SP register in MIPS
@@ -107,7 +107,7 @@ u32 unused_8038B894[3] = { 0 };
    cmd+0x04: void *branchTarget
 */
 void geo_layout_cmd_branch_and_link(void) {
-    gGeoLayoutStack[gGeoLayoutStackIndex++] = (uintptr_t) (gGeoLayoutCommand + CMD_PROCESS_OFFSET(8));
+    gGeoLayoutStack[gGeoLayoutStackIndex++] = (u32) (gGeoLayoutCommand + CMD_PROCESS_OFFSET(8));
     gGeoLayoutStack[gGeoLayoutStackIndex++] = (gCurGraphNodeIndex << 16) + gGeoLayoutReturnIndex;
     gGeoLayoutReturnIndex = gGeoLayoutStackIndex;
     gGeoLayoutCommand = segmented_to_virtual(cur_geo_cmd_ptr(0x04));
@@ -127,7 +127,7 @@ void geo_layout_cmd_end(void) {
 */
 void geo_layout_cmd_branch(void) {
     if (cur_geo_cmd_u8(0x01) == 1) {
-        gGeoLayoutStack[gGeoLayoutStackIndex++] = (uintptr_t) (gGeoLayoutCommand + CMD_PROCESS_OFFSET(8));
+        gGeoLayoutStack[gGeoLayoutStackIndex++] = (u32) (gGeoLayoutCommand + CMD_PROCESS_OFFSET(8));
     }
 
     gGeoLayoutCommand = segmented_to_virtual(cur_geo_cmd_ptr(0x04));

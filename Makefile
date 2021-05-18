@@ -6,7 +6,7 @@ include util.mk
 default: all
 
 # Preprocessor definitions
-DEFINES :=
+DEFINES :=  NDEBUG=1 _FINALROM=1
 
 #==============================================================================#
 # Build Options                                                                #
@@ -20,11 +20,9 @@ TARGET_N64 ?= 1
 
 
 # COMPILER - selects the C compiler to use
-#   ido - uses the SGI IRIS Development Option compiler, which is used to build
-#         an original matching N64 ROM
 #   gcc - uses the GNU C Compiler
-COMPILER ?= ido
-$(eval $(call validate-option,COMPILER,ido gcc))
+COMPILER ?= gcc
+$(eval $(call validate-option,COMPILER,gcc))
 
 
 # VERSION - selects the version of the game to build
@@ -38,22 +36,22 @@ $(eval $(call validate-option,VERSION,jp us eu sh))
 ifeq      ($(VERSION),jp)
   DEFINES   += VERSION_JP=1
   OPT_FLAGS := -g
-  GRUCODE   ?= f3d_old
+  GRUCODE   ?= f3dex2
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),us)
   DEFINES   += VERSION_US=1
   OPT_FLAGS := -g
-  GRUCODE   ?= f3d_old
+  GRUCODE   ?= f3dex2
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),eu)
   DEFINES   += VERSION_EU=1
   OPT_FLAGS := -O2
-  GRUCODE   ?= f3d_new
+  GRUCODE   ?= f3dex2
   VERSION_JP_US  ?= false
 else ifeq ($(VERSION),sh)
   DEFINES   += VERSION_SH=1
   OPT_FLAGS := -O2
-  GRUCODE   ?= f3d_new
+  GRUCODE   ?= f3dex2
   VERSION_JP_US  ?= false
 endif
 
@@ -66,39 +64,15 @@ TARGET := sm64.$(VERSION)
 #   f3dex   -
 #   f3dex2  -
 #   f3dzex  - newer, experimental microcode used in Animal Crossing
-$(eval $(call validate-option,GRUCODE,f3d_old f3dex f3dex2 f3d_new f3dzex))
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2))
 
-ifeq      ($(GRUCODE),f3d_old)
-  DEFINES += F3D_OLD=1
-else ifeq ($(GRUCODE),f3d_new) # Fast3D 2.0H
-  DEFINES += F3D_NEW=1
-else ifeq ($(GRUCODE),f3dex) # Fast3DEX
+ifeq ($(GRUCODE),f3dex) # Fast3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE), f3dex2) # Fast3DEX2
   DEFINES += F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.0J / Animal Forest - Dōbutsu no Mori)
-  $(warning Fast3DZEX is experimental. Try at your own risk.)
-  DEFINES += F3DZEX_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 endif
 
-
-# USE_QEMU_IRIX - when ido is selected, select which way to emulate IRIX programs
-#   1 - use qemu-irix
-#   0 - statically recompile the IRIX programs
-USE_QEMU_IRIX ?= 0
-$(eval $(call validate-option,USE_QEMU_IRIX,0 1))
-
-ifeq      ($(COMPILER),ido)
-  ifeq ($(USE_QEMU_IRIX),1)
-    # Verify that qemu-irix exists
-    QEMU_IRIX ?= $(call find-command,qemu-irix)
-    ifeq (, $(QEMU_IRIX))
-      $(error Using the IDO compiler requires qemu-irix. Please install qemu-irix package or set the QEMU_IRIX environment variable to the full qemu-irix binary path)
-    endif
-  endif
-
-  MIPSISET := -mips2
-else ifeq ($(COMPILER),gcc)
+ifeq ($(COMPILER),gcc)
   NON_MATCHING := 1
   MIPSISET     := -mips3
   OPT_FLAGS    := -O2
@@ -278,38 +252,11 @@ endif
 #==============================================================================#
 
 # detect prefix for MIPS toolchain
-ifneq      ($(call find-command,mips-linux-gnu-ld),)
-  CROSS := mips-linux-gnu-
-else ifneq ($(call find-command,mips64-linux-gnu-ld),)
-  CROSS := mips64-linux-gnu-
-else ifneq ($(call find-command,mips64-elf-ld),)
-  CROSS := mips64-elf-
-else
-  $(error Unable to detect a suitable MIPS toolchain installed)
-endif
+CROSS := mips-n64-
 
 AS        := $(CROSS)as
-ifeq ($(COMPILER),gcc)
-  CC      := $(CROSS)gcc
-else
-  ifeq ($(USE_QEMU_IRIX),1)
-    IRIX_ROOT := $(TOOLS_DIR)/ido5.3_compiler
-    CC      := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/bin/cc
-    ACPP    := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/lib/acpp
-    COPT    := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/lib/copt
-  else
-    IDO_ROOT := $(TOOLS_DIR)/ido5.3_recomp
-    CC      := $(IDO_ROOT)/cc
-    ACPP    := $(IDO_ROOT)/acpp
-    COPT    := $(IDO_ROOT)/copt
-  endif
-endif
-# Prefer gcc's cpp if installed on the system
-ifneq (,$(call find-command,cpp-10))
-  CPP     := cpp-10
-else
-  CPP     := cpp
-endif
+CC        := $(CROSS)gcc
+CPP       := cpp
 LD        := $(CROSS)ld
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
@@ -320,17 +267,13 @@ ifeq ($(TARGET_N64),1)
   CC_CFLAGS := -fno-builtin
 endif
 
-INCLUDE_DIRS := include $(BUILD_DIR) $(BUILD_DIR)/include src .
+INCLUDE_DIRS := /usr/include/n64 include $(BUILD_DIR) $(BUILD_DIR)/include src .
 ifeq ($(TARGET_N64),1)
   INCLUDE_DIRS += include/libc
 endif
 
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
-
-# Check code syntax with host compiler
-CC_CHECK := gcc
-CC_CHECK_CFLAGS := -fsyntax-only -fsigned-char $(CC_CFLAGS) $(TARGET_CFLAGS) -std=gnu90 -Wall -Wextra -Wno-format-security -Wno-main -DNON_MATCHING -DAVOID_UB $(DEF_INC_CFLAGS)
 
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
@@ -645,77 +588,10 @@ $(GLOBAL_ASM_DEP).$(NON_MATCHING):
 # Compile C code
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
-	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
-	$(V)$(CC) -c $(CFLAGS) -o $@ $<
+	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	$(call print,Compiling:,$<,$@)
-	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
-	$(V)$(CC) -c $(CFLAGS) -o $@ $<
-
-# Alternate compiler flags needed for matching
-ifeq ($(COMPILER),ido)
-  $(BUILD_DIR)/levels/%/leveldata.o: OPT_FLAGS := -g
-  $(BUILD_DIR)/actors/%.o:           OPT_FLAGS := -g
-  $(BUILD_DIR)/bin/%.o:              OPT_FLAGS := -g
-  $(BUILD_DIR)/src/goddard/%.o:      OPT_FLAGS := -g
-  $(BUILD_DIR)/src/goddard/%.o:      MIPSISET := -mips1
-  $(BUILD_DIR)/lib/src/%.o:          OPT_FLAGS :=
-  $(BUILD_DIR)/lib/src/math/%.o:     OPT_FLAGS := -O2
-  $(BUILD_DIR)/lib/src/math/ll%.o:   OPT_FLAGS :=
-  $(BUILD_DIR)/lib/src/math/ll%.o:   MIPSISET := -mips3 -32
-  $(BUILD_DIR)/lib/src/ldiv.o:       OPT_FLAGS := -O2
-  $(BUILD_DIR)/lib/src/string.o:     OPT_FLAGS := -O2
-  $(BUILD_DIR)/lib/src/gu%.o:        OPT_FLAGS := -O3
-  $(BUILD_DIR)/lib/src/al%.o:        OPT_FLAGS := -O3
-  # For the asm-processor, since it doesn't support -O3. Probably not actually compiled with these flags.
-  ifeq ($(VERSION),sh)
-    $(BUILD_DIR)/lib/src/unk_shindou_file.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/func_sh_80304D20.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/_Printf.o: OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/contramread.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/osPfsIsPlug.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/osAiSetFrequency.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/contramwrite.o: OPT_FLAGS := -O1
-    $(BUILD_DIR)/lib/src/sprintf.o: OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/_Litob.o: OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/_Ldtob.o: OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/osDriveRomInit.o: OPT_FLAGS := -g
-  endif
-  ifeq ($(VERSION),eu)
-    $(BUILD_DIR)/lib/src/_Litob.o:   OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/_Ldtob.o:   OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/_Printf.o:  OPT_FLAGS := -O3
-    $(BUILD_DIR)/lib/src/sprintf.o:  OPT_FLAGS := -O3
-
-    # Enable loop unrolling except for external.c (external.c might also have used
-    # unrolling, but it makes one loop harder to match).
-    # For all audio files other than external.c and port_eu.c, put string literals
-    # in .data. (In Shindou, the port_eu.c string literals also moved to .data.)
-    $(BUILD_DIR)/src/audio/%.o:        OPT_FLAGS := -O2 -use_readwrite_const
-    $(BUILD_DIR)/src/audio/port_eu.o:  OPT_FLAGS := -O2
-    $(BUILD_DIR)/src/audio/external.o: OPT_FLAGS := -O2 -Wo,-loopunroll,0
-  endif
-  ifeq ($(VERSION_JP_US),true)
-    $(BUILD_DIR)/src/audio/%.o:        OPT_FLAGS := -O2 -Wo,-loopunroll,0
-    $(BUILD_DIR)/src/audio/load.o:     OPT_FLAGS := -O2 -framepointer -Wo,-loopunroll,0
-  endif
-  ifeq ($(VERSION_JP_US),true)
-    # The source-to-source optimizer copt is enabled for audio. This makes it use
-    # acpp, which needs -Wp,-+ to handle C++-style comments.
-    # All other files than external.c should really use copt, but only a few have
-    # been matched so far.
-    $(BUILD_DIR)/src/audio/effects.o:   OPT_FLAGS := -O2 -Wo,-loopunroll,0 -sopt,-inline=sequence_channel_process_sound,-scalaroptimize=1 -Wp,-+
-    $(BUILD_DIR)/src/audio/synthesis.o: OPT_FLAGS := -O2 -sopt,-scalaroptimize=1 -Wp,-+
-  endif
-
-# Add a target for build/eu/src/audio/*.copt to make it easier to see debug
-$(BUILD_DIR)/src/audio/%.acpp: src/audio/%.c
-	$(ACPP) $(TARGET_CFLAGS) $(DEF_INC_CFLAGS) -D__sgi -+ $< > $@
-$(BUILD_DIR)/src/audio/%.copt: $(BUILD_DIR)/src/audio/%.acpp
-	$(COPT) -signed -I=$< -CMP=$@ -cp=i -scalaroptimize=1 $(COPTFLAGS)
-$(BUILD_DIR)/src/audio/seqplayer.copt: COPTFLAGS := -inline_manual
-
-endif
+	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Assemble assembly code
 $(BUILD_DIR)/%.o: %.s
@@ -732,21 +608,15 @@ $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT)
 	$(call print,Preprocessing linker script:,$<,$@)
 	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
-# Link libultra
-$(BUILD_DIR)/libultra.a: $(ULTRA_O_FILES)
-	@$(PRINT) "$(GREEN)Linking libultra:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(AR) rcs -o $@ $(ULTRA_O_FILES)
-	$(V)$(TOOLS_DIR)/patch_libultra_math $@
-
 # Link libgoddard
 $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)
 	@$(PRINT) "$(GREEN)Linking libgoddard:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(AR) rcs -o $@ $(GODDARD_O_FILES)
 
 # Link SM64 ELF file
-$(ELF): $(O_FILES) $(MIO0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) undefined_syms.txt $(BUILD_DIR)/libultra.a $(BUILD_DIR)/libgoddard.a
+$(ELF): $(O_FILES) $(MIO0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) undefined_syms.txt $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -lultra -lgoddard
+	$(V)$(LD) -L /usr/lib/n64/ -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -lultra_rom -lgoddard
 
 # Build ROM
 $(ROM): $(ELF)

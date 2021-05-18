@@ -302,9 +302,9 @@ void *sound_alloc_uninitialized(struct SoundAllocPool *pool, u32 size) {
 #endif
 
 void sound_alloc_pool_init(struct SoundAllocPool *pool, void *memAddr, u32 size) {
-    pool->cur = pool->start = (u8 *) ALIGN16((uintptr_t) memAddr);
+    pool->cur = pool->start = (u8 *) ALIGN16((u32) memAddr);
 #ifdef VERSION_SH
-    pool->size = size - ((uintptr_t) memAddr & 0xf);
+    pool->size = size - ((u32) memAddr & 0xf);
 #else
     pool->size = size;
 #endif
@@ -686,7 +686,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 
             case 1:
 #if defined(VERSION_SH)
-                tp->entries[1].ptr = (u8 *) ((uintptr_t) (pool->start + pool->size - size) & ~0x0f);
+                tp->entries[1].ptr = (u8 *) ((u32) (pool->start + pool->size - size) & ~0x0f);
 #elif defined(VERSION_EU)
                 tp->entries[1].ptr = pool->start + pool->size - size - 0x10;
 #else

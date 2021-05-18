@@ -30,7 +30,7 @@ struct GdControl gGdCtrlPrev; // @ 801B9A18; previous frame's controller info
 u32 __main__(void) {
     UNUSED u32 pad1C;
 
-    gd_printf("%x, %x\n", (u32) (uintptr_t) &D_801A8058, (u32) (uintptr_t) &gGdMoveScene);
+    gd_printf("%x, %x\n", (u32) (u32) &D_801A8058, (u32) (u32) &gGdMoveScene);
     imin("main");
     gd_init();
 

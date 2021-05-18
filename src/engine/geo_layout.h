@@ -34,7 +34,7 @@ extern struct GraphNode *gCurRootGraphNode;
 extern UNUSED s32 D_8038BCA8;
 extern struct GraphNode **gGeoViews;
 extern u16 gGeoNumViews;
-extern uintptr_t gGeoLayoutStack[];
+extern u32 gGeoLayoutStack[];
 extern struct GraphNode *gCurGraphNodeList[];
 extern s16 gCurGraphNodeIndex;
 extern s16 gGeoLayoutStackIndex;

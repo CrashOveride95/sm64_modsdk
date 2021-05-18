@@ -44,14 +44,14 @@ typedef s16 Vec4s[4];
 
 typedef f32 Mat4[4][4];
 
-typedef uintptr_t GeoLayout;
-typedef uintptr_t LevelScript;
+typedef u32 GeoLayout;
+typedef u32 LevelScript;
 typedef s16 Movtex;
 typedef s16 MacroObject;
 typedef s16 Collision;
 typedef s16 Trajectory;
 typedef s16 PaintingData;
-typedef uintptr_t BehaviorScript;
+typedef u32 BehaviorScript;
 typedef u8 Texture;
 
 enum SpTaskState {
@@ -190,7 +190,7 @@ struct Object
     /*0x1C8*/ u32 unused1;
     /*0x1CC*/ const BehaviorScript *curBhvCommand;
     /*0x1D0*/ u32 bhvStackIndex;
-    /*0x1D4*/ uintptr_t bhvStack[8];
+    /*0x1D4*/ u32 bhvStack[8];
     /*0x1F4*/ s16 bhvDelayTimer;
     /*0x1F6*/ s16 respawnInfoType;
     /*0x1F8*/ f32 hitboxRadius;
