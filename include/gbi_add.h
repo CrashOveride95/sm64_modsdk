@@ -24,6 +24,9 @@
 #ifdef	F3DEX_GBI_2
 #define gsSPGeometryModeSetFirst(c, s)	gsSPGeometryMode(c, s)
 #else	/* F3DEX_GBI_2 */
+#define gsSPGeometryMode(c, s)						\
+	gsSPClearGeometryMode(c),					\
+	gsSPSetGeometryMode(s)
 #define gsSPGeometryModeSetFirst(c, s)					\
 	gsSPSetGeometryMode(s),						\
 	gsSPClearGeometryMode(c)

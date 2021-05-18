@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
+#include <gbi_add.h>
 
 #include "geo_commands.h"
 #include "macros.h"
